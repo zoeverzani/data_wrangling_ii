@@ -212,3 +212,64 @@ data_marj %>%
 ``` r
   # rotates X axis labels 
 ```
+
+## Resturant Inspection
+
+``` r
+data("rest_inspec")
+
+rest_inspec %>% 
+   janitor::clean_names()
+```
+
+    ## # A tibble: 397,584 x 18
+    ##    action        boro   building   camis critical_flag cuisine_descrip… dba     
+    ##    <chr>         <chr>  <chr>      <int> <chr>         <chr>            <chr>   
+    ##  1 Violations w… MANHA… 425       4.15e7 Not Critical  Italian          SPINELL…
+    ##  2 Violations w… MANHA… 37        4.12e7 Critical      Korean           SHILLA …
+    ##  3 Violations w… MANHA… 15        4.11e7 Not Critical  CafÃ©/Coffee/Te… CITY PE…
+    ##  4 Violations w… MANHA… 35        4.13e7 Critical      Korean           MADANGS…
+    ##  5 Violations w… MANHA… 1271      5.00e7 Critical      American         THE HAR…
+    ##  6 Violations w… MANHA… 155       5.00e7 Not Critical  Donuts           DUNKIN …
+    ##  7 Violations w… MANHA… 1164      5.00e7 Critical      Salads           SWEETGR…
+    ##  8 Violations w… MANHA… 37        4.12e7 Not Critical  Korean           SHILLA …
+    ##  9 Violations w… MANHA… 299       5.01e7 Not Critical  American         PRET A …
+    ## 10 Violations w… MANHA… 53        4.04e7 Not Critical  Korean           HAN BAT…
+    ## # … with 397,574 more rows, and 11 more variables: inspection_date <dttm>,
+    ## #   inspection_type <chr>, phone <chr>, record_date <dttm>, score <int>,
+    ## #   street <chr>, violation_code <chr>, violation_description <chr>,
+    ## #   zipcode <int>, grade <chr>, grade_date <dttm>
+
+``` r
+rest_inspec =
+  rest_inspec %>%
+  filter(grade %in% c("A", "B", "C"), boro != "Missing") %>% 
+  mutate(boro = str_to_title(boro))
+```
+
+``` r
+rest_inspec %>% 
+  filter(str_detect(dba, "[Pp][Ii][Zz][Zz][Aa]")) %>% 
+  mutate(
+    boro = str_replace(boro, "Manhattan", "The City"),
+    boro = fct_infreq(boro)
+    # make sure you but str_replace first 
+  ) %>% 
+  ggplot(aes(x = boro, fill = grade)) + 
+  geom_bar() 
+```
+
+![](strings_and_factors_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+rest_inspec %>% 
+  filter(str_detect(dba, "[Pp][Ii][Zz][Zz][Aa]")) %>% 
+  mutate(
+    boro = fct_infreq(boro),
+    boro = fct_recode(boro, "The City" = "Manhattan")
+  ) %>% 
+  ggplot(aes(x = boro, fill = grade)) + 
+  geom_bar() 
+```
+
+![](strings_and_factors_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
